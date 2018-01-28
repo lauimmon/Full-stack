@@ -10,23 +10,13 @@ class App extends React.Component {
         huono: 0
       }
     }
-  
-    clickHyva = () => {
-      this.setState({
-        hyva: this.state.hyva + 1
-      })
-    }
-  
-    clickNeutraali = () => {
-      this.setState({
-        neutraali: this.state.neutraali + 1
-      })
-    }
 
-    clickHuono = () => {
-        this.setState({
-          huono: this.state.huono + 1
-        })
+    clickButton = (param) => {
+        return () => {
+            this.setState({
+                [param]: this.state[param] + 1
+            })
+        }
     }
   
     render() {
@@ -41,9 +31,9 @@ class App extends React.Component {
         <div>
           <div>
             <Title title="anna palautetta" />
-            <Button onClick={this.clickHyva} text="hyvä" />
-            <Button onClick={this.clickNeutraali} text="neutraali" />
-            <Button onClick={this.clickHuono} text="huono" />
+            <Button onClick={this.clickButton('hyva')} text="hyvä" />
+            <Button onClick={this.clickButton('neutraali')} text="neutraali" />
+            <Button onClick={this.clickButton('huono')} text="huono" />
             <Title title="statistiikka" />
             <Statistics state={this.state} />
           </div>
@@ -61,22 +51,30 @@ const Title = (props) => {
 }
 
 const Statistics = (props) => {
+    if (noFeedback(props)) {
+        return (
+        <p>ei yhtään palautetta annettu</p> 
+        )
+    }
     return (
-        <div>
-            <Statistic text="hyvä" value={props.state.hyva} />
-            <Statistic text="neutraali" value={props.state.neutraali} />
-            <Statistic text="huono" value={props.state.huono} />
-            <Statistic text="keskiarvo" value={average(props)} />
-            <Statistic text="positiivisia" value={positive(props)} />
-        </div>
+        <table>
+            <tbody>
+                <Statistic text="hyvä" value={props.state.hyva} />
+                <Statistic text="neutraali" value={props.state.neutraali} />
+                <Statistic text="huono" value={props.state.huono} />
+                <Statistic text="keskiarvo" value={average(props)} />
+                <Statistic text="positiivisia" value={positive(props)} />
+            </tbody>
+        </table>
     )
 }
 
 const Statistic = (props) => {
     return (
-        <div>
-            <p>{props.text} {props.value} </p>
-        </div>
+        <tr>
+            <td>{props.text}</td> 
+            <td>{props.value}</td>
+        </tr>
     )
 }
 
@@ -102,6 +100,13 @@ const positive = (props) => {
     return (
         (hyva) * 100 / (hyva + neutraali + huono) + " %"
     ) 
+}
+
+const noFeedback = (props) => {
+    const hyva = props.state.hyva
+    const neutraali = props.state.neutraali
+    const huono = props.state.huono
+    return (hyva + neutraali + huono === 0)
 }
 
 
